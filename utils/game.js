@@ -46,7 +46,7 @@ var data = {
     9:[
       "Pepino",
       "Mumm Ra",
-      "Viernes"],
+      "Oreo"],
     10:[
       "Choko",
       "Uub",
