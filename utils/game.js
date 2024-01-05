@@ -137,6 +137,7 @@ function get_time_2(end, start){
   return secs;
 }
 
+
 function table_score(){
   /*
   var data_name_value="M.I. Test 6", time_played=500;
@@ -147,7 +148,7 @@ function table_score(){
   console.log("ready");
   */
   session = driver.session();
-  session.run("MATCH (jugador:Jugador) RETURN jugador ORDER BY jugador.score LIMIT 10;")
+  session.run("MATCH (jugador:Jugador) RETURN jugador ORDER BY jugador.score LIMIT 20;")
   .then(result => {
     var score = document.querySelector('#score');
     score.innerHTML = "";
@@ -216,9 +217,19 @@ document.addEventListener('DOMContentLoaded', ()=> {
         try{
           var data_name_value=data_name.value;
           const session_save = driver.session();
-          session_save.run('CREATE (:Jugador {nombre: $data_name_value, score: $time_played});',{data_name_value, time_played})
-          session_save.commit();
-          session_save.close();
+          const existeQuery = 'MATCH (j:Jugador {nombre: $data_name_value}) RETURN j';
+          session_save.run(existeQuery, {data_name_value}).then(result => {
+            console.log(result.records);
+            if (result.records.length > 0) {
+              const actualizarQuery = 'MATCH (j:Jugador {nombre: $data_name_value}) SET j.score = $time_played RETURN j';
+              session_save.run(actualizarQuery, { data_name_value, time_played });
+            }
+            else{
+              session_save.run('CREATE (:Jugador {nombre: $data_name_value, score: $time_played});',{data_name_value, time_played})
+            }
+            session_save.commit();
+            session_save.close();
+          });
         }
         finally{
           list.removeChild(data_name);
@@ -272,6 +283,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         list.appendChild(input);
         document.querySelector(".btn"+i).addEventListener('click', function() {
+
+          document.querySelector("#key_game").play();
+
           document.querySelector(".btn"+i).classList.add('shot');
           document.querySelector(".btn"+i).style.visibility = "hidden";
           if(document.querySelector(".btn"+i).value != data['chaplins'][camada][con-1]){
@@ -291,6 +305,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
 
   btn.onclick = () => {
+    document.querySelector("#key_game").play();
     btn.style.pointerEvents = 'none';
     start = Date.now();
     tower();
