@@ -59,9 +59,30 @@ var data = {
       "Funko",
       "Koopa",
       "Locomia",
-      "Fonsi"]
+      "Fonsi"],
+    12:[
+      "Tilin",
+      "Geminis",
+      "Caradura",
+      "Mowgli",
+      "Chupetin"]
   }
 };
+
+
+const decalogo = {
+  "EL PARDILLO ES EL ÚLTIMO MONO" : 1,
+  "EL PARDILLO NO OPINA" : 2,
+  "EL PARDILLO ES UN SER SONRIENTE Y SERVICIAL PARA CON LA VETERANÍA. EL PARDILLO DA TODO DE SÍ PARA LA TUNA, NUNCA ESPERA NADA DE ELLA." : 3,
+  "ES MENESTER LA DEMOSTRACIÓN, POR EL PARDO, DE SUS BUENAS ARTES MUSICALES" : 4,
+  "LOS ENSAYOS SON SAGRADOS PARA EL PARDILLO" : 5,
+  "EL VINO ES INDISPENSABLE EN TODO BUEN ENSAYO" : 6,
+  "ES COMPETENCIA DE LA TUNA CONOCER QUE EL PARDO ES UN BUEN BEBEDOR" : 7,
+  "LAS DEMOSTRACIONES DEL PARDILLO EN EL ARTE DE LA CONQUISTA DE FÉMINAS DEBERÁN SER CONVINCENTES, ELEGANTES, CORTESES, VARONILES Y SOBRE TODO DE BUEN GUSTO" : 8,
+  "EL PARDILLO LLAMADO A SER TUNO HA DE ALBERGAR DENTRO DE SÍ A UN SER DE MONSTRUOSA ALEGRÍA E INGENIO MENTAL" : 9,
+  "LAS RONDAS SON EL PAN DE LA TUNA" : 10,
+}
+
 
 const colors = [
   "#FF0000", // Rojo
@@ -86,6 +107,11 @@ const colors = [
   "#00CED1" // Turquesa
 ];
 
+let url = "", user='', password='';
+var driver, session;
+const request = new XMLHttpRequest();
+var list = document.querySelector('#button-container');
+
 
 function obtenerListaAleatoria(lista) {
   var listaAleatoria = lista.slice();
@@ -97,6 +123,7 @@ function obtenerListaAleatoria(lista) {
   return listaAleatoria;
 }
 
+
 function get_time(end, start){
   var time = "";
   let secs = (end - start)/1000;
@@ -105,12 +132,55 @@ function get_time(end, start){
     time += mins + " min ";
   return time + Math.round(secs%60) + " sec";
 }
+function get_time_2(end, start){
+  let secs = (end - start)/1000;
+  return secs;
+}
+
+function table_score(){
+  /*
+  var data_name_value="M.I. Test 6", time_played=500;
+  const session_save = driver.session();
+  session_save.run('CREATE (:Jugador {nombre: $data_name_value, score: $time_played});',{data_name_value, time_played})
+  session_save.commit();
+  session_save.close();
+  console.log("ready");
+  */
+  session = driver.session();
+  session.run("MATCH (jugador:Jugador) RETURN jugador ORDER BY jugador.score LIMIT 10;")
+  .then(result => {
+    var score = document.querySelector('#score');
+    score.innerHTML = "";
+    var cad_score = "<u><b>Score</b></u>(F5 para tu score agregado)<br>";
+    //console.log(result);
+    const record = result.records;
+    //console.log(record);
+    var con_pos = 1;
+    record.forEach(item => {
+      var name, score;
+      name = item._fields[0].properties.nombre;
+      score = item._fields[0].properties.score;
+      cad_score += con_pos+". " + name + " - " + Math.floor(score/60) + " min " + (score % 60) + " sec <br>";
+      con_pos++;
+    });
+    score.innerHTML = cad_score;
+    list.appendChild(score);
+  });
+}
 
 document.addEventListener('DOMContentLoaded', ()=> {
+  url = "neo4j+s://ab00930f.databases.neo4j.io";
+  user = "neo4j";
+  password = "Jr6WsGyIVqnL0sXRKqp3ubAVmrDNu4M4tQyo4flXJjI";
+  driver = neo4j.driver(url, neo4j.auth.basic(user, password));
+
+  table_score();
+
+  //console.log(decalogo);
+  //console.log(shuffleDictionary(decalogo));
   document.querySelector("#play").muted = false;
 
-  list = document.querySelector('#button-container');
-  let camada = 1, current=0,size=11, n_tunos=49;
+  let camada = 1, current=0,size=12, n_tunos=54;
   var start, end;
   btn = document.querySelector('#btn_title');
 
@@ -121,19 +191,58 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }, 500);
   });
 
-  function finish(win=false){
-    if(win)
-      document.querySelector("#play").play();
-    else
-      document.querySelector("#fail").play();
-
+  async function finish(win=false){
     list.innerHTML = "";
     var info = document.createElement("p");
     info.setAttribute("id", "info");
     var end = Date.now();
+    var time_played = get_time_2(end,start);
     info.innerHTML = " <b>Pardo power:</b> "+ Math.ceil(current/n_tunos * 100) + 
                     "% <br><br><b>Time: </b>" + get_time(end,start) + " <br>";
     list.appendChild(info);
+    list.innerHTML += "<br>"
+
+    if(win){
+      document.querySelector("#play").play();
+      var data_name = document.createElement("input");
+      data_name.setAttribute("id", "info");
+      data_name.setAttribute("type", "text");
+      var send_btn = document.createElement("input");
+      send_btn.setAttribute("id", "btn_title");
+      send_btn.setAttribute("type", "button");
+      send_btn.setAttribute("value", "Enviar");
+
+      send_btn.onclick = () => {
+        try{
+          var data_name_value=data_name.value;
+          const session_save = driver.session();
+          session_save.run('CREATE (:Jugador {nombre: $data_name_value, score: $time_played});',{data_name_value, time_played})
+          session_save.commit();
+          session_save.close();
+        }
+        finally{
+          list.removeChild(data_name);
+          list.removeChild(send_btn);
+          var score = document.createElement("p");
+          score.setAttribute("id", "score");
+          table_score();
+          list.appendChild(score); 
+        }
+
+       
+      }
+      
+      list.appendChild(data_name);
+      list.appendChild(send_btn);
+    }
+    else{
+      document.querySelector("#fail").play();
+
+      var score = document.createElement("p");
+      score.setAttribute("id", "score");
+      table_score();
+      list.appendChild(score);
+    }
 
     camada = 1;
     current=0;

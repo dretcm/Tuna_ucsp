@@ -60,7 +60,7 @@
   border-color: #c71237;
 }
 
-#info{
+#info, #score{
   font-family: "Arial", sans-serif; /* Fuente del texto */
   font-size: 2.5vw;
   color: #333; /* Color del texto */
