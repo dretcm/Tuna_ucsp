@@ -130,7 +130,7 @@ function get_time(end, start){
   let mins = Math.floor(secs/60);
   if(mins>0)
     time += mins + " min ";
-  return time + Math.round(secs%60) + " sec";
+  return time + secs%60 + " sec";
 }
 function get_time_2(end, start){
   let secs = (end - start)/1000;
