@@ -34,7 +34,7 @@ var data = {
     7:[
       "Joshi",
       "Manzana",
-      "Pichon de Ouija"],
+      "Pichón de Ouija"],
     8:[
       "Pompinchu",
       "Chacana",
@@ -61,11 +61,17 @@ var data = {
       "Locomia",
       "Fonsi"],
     12:[
-      "Tilin",
+      "Tilín",
       "Geminis",
       "Caradura",
       "Mowgli",
-      "Chupetin"]
+      "Chupetín"],
+    13:[
+      "Chungus",
+      "Novita",
+      "Churicata",
+      "Abelardo",
+      "Lujurio"]
   }
 };
 
@@ -125,55 +131,103 @@ function obtenerListaAleatoria(lista) {
 
 
 function get_time(end, start){
-  var time = "";
-  let secs = (end - start)/1000;
-  let mins = Math.floor(secs/60);
-  if(mins>0)
+  let secs = Math.floor((end - start) / 1000);
+  let mins = Math.floor(secs / 60);
+
+  let time = "";
+  if (mins > 0)
     time += mins + " min ";
-  return time + secs%60 + " sec";
+
+  return time + (secs % 60) + " sec";
 }
+
+
 function get_time_2(end, start){
-  let secs = (end - start)/1000;
-  return secs;
+  return Math.floor((end - start) / 1000);
 }
 
 
-function table_score(){
-  /*
-  var data_name_value="M.I. Test 6", time_played=500;
-  const session_save = driver.session();
-  session_save.run('CREATE (:Jugador {nombre: $data_name_value, score: $time_played});',{data_name_value, time_played})
-  session_save.commit();
-  session_save.close();
-  console.log("ready");
-  */
-  session = driver.session();
-  session.run("MATCH (jugador:Jugador) RETURN jugador ORDER BY jugador.score LIMIT 20;")
-  .then(result => {
-    var score = document.querySelector('#score');
-    score.innerHTML = "";
-    var cad_score = "<u><b>Score</b></u>(F5 para tu score agregado)<br>";
-    //console.log(result);
-    const record = result.records;
-    //console.log(record);
-    var con_pos = 1;
-    record.forEach(item => {
-      var name, score;
-      name = item._fields[0].properties.nombre;
-      score = item._fields[0].properties.score;
-      cad_score += con_pos+". " + name + " - " + Math.floor(score/60) + " min " + (score % 60) + " sec <br>";
-      con_pos++;
-    });
-    score.innerHTML = cad_score;
-    list.appendChild(score);
+async function table_score() {
+  const { collection, getDocs, query, orderBy, limit } = window.fs;
+
+  let scoreEl = document.querySelector('#score');
+
+  if (!scoreEl) {
+    scoreEl = document.createElement("p");
+    scoreEl.setAttribute("id", "score");
+    list.appendChild(scoreEl);
+  }
+
+  scoreEl.innerHTML = "Cargando ranking...";
+
+  const q = query(
+    collection(db, "scores"),
+    orderBy("time"),
+    limit(20)
+  );
+
+  const snap = await getDocs(q);
+
+  let html = "<u><b>Score</b></u><br>";
+  let pos = 1;
+
+  snap.forEach(doc => {
+    const d = doc.data();
+    const min = Math.floor(d.time / 60);
+    const sec = Math.floor(d.time % 60);
+
+    let medal = "";
+    let cls = "";
+
+    if (pos === 1) { medal = "🥇 "; cls = "gold"; }
+    else if (pos === 2) { medal = "🥈 "; cls = "silver"; }
+    else if (pos === 3) { medal = "🥉 "; cls = "bronze"; }
+
+  let meClass = (window.lastPlayerName && window.lastPlayerName === d.nombre) ? "me":"";
+
+
+    html += `
+      <div class="${cls} ${meClass}">
+        ${pos}. ${medal}${d.nombre} = ${min} min ${sec} sec
+      </div>
+    `;
+
+    pos++;
   });
+
+  scoreEl.innerHTML = html;
 }
+
+
+async function saveScore(nombre, time_played) {
+  const { collection, addDoc, getDocs, query, where, updateDoc } = window.fs;
+
+  const scoresRef = collection(db, "scores");
+
+  // Buscar si el nombre ya existe
+  const q = query(scoresRef, where("nombre", "==", nombre));
+  const snap = await getDocs(q);
+
+  if (!snap.empty) {
+    // Si existe, actualizar SOLO si mejora el tiempo
+    const docRef = snap.docs[0].ref;
+    const oldTime = snap.docs[0].data().time;
+
+    if (time_played < oldTime) {
+      await updateDoc(docRef, { time: time_played });
+    }
+  } else {
+    // Nuevo jugador
+    await addDoc(scoresRef, {
+      nombre: nombre,
+      time: time_played,
+      createdAt: Date.now()
+    });
+  }
+}
+
 
 document.addEventListener('DOMContentLoaded', ()=> {
-  url = "neo4j+s://ab00930f.databases.neo4j.io";
-  user = "neo4j";
-  password = "Jr6WsGyIVqnL0sXRKqp3ubAVmrDNu4M4tQyo4flXJjI";
-  driver = neo4j.driver(url, neo4j.auth.basic(user, password));
 
   table_score();
 
@@ -181,7 +235,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
   //console.log(shuffleDictionary(decalogo));
   document.querySelector("#play").muted = false;
 
-  let camada = 1, current=0,size=12, n_tunos=54;
+  let camada = 1, current=0,size=13, n_tunos=59;
   var start, end;
   btn = document.querySelector('#btn_title');
 
@@ -198,7 +252,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     info.setAttribute("id", "info");
     var end = Date.now();
     var time_played = get_time_2(end,start);
-    info.innerHTML = " <b>Pardo power:</b> "+ Math.ceil(current/n_tunos * 100) + 
+    info.innerHTML = " <b>Pardo Power:</b> "+ Math.ceil(current/n_tunos * 100) + 
                     "% <br><br><b>Time: </b>" + get_time(end,start) + " <br>";
     list.appendChild(info);
     list.innerHTML += "<br>"
@@ -206,42 +260,38 @@ document.addEventListener('DOMContentLoaded', ()=> {
     if(win){
       document.querySelector("#play").play();
       var data_name = document.createElement("input");
-      data_name.setAttribute("id", "info");
+      data_name.setAttribute("id", "player_name");
       data_name.setAttribute("type", "text");
+      data_name.setAttribute("maxlength", "20");
+      data_name.setAttribute("placeholder", "Nombre (máx 20)");
       var send_btn = document.createElement("input");
       send_btn.setAttribute("id", "btn_title");
       send_btn.setAttribute("type", "button");
       send_btn.setAttribute("value", "Enviar");
 
-      send_btn.onclick = () => {
-        try{
-          var data_name_value=data_name.value;
-          const session_save = driver.session();
-          const existeQuery = 'MATCH (j:Jugador {nombre: $data_name_value}) RETURN j';
-          session_save.run(existeQuery, {data_name_value}).then(result => {
-            console.log(result.records);
-            if (result.records.length > 0) {
-              const actualizarQuery = 'MATCH (j:Jugador {nombre: $data_name_value}) SET j.score = $time_played RETURN j';
-              session_save.run(actualizarQuery, { data_name_value, time_played });
-            }
-            else{
-              session_save.run('CREATE (:Jugador {nombre: $data_name_value, score: $time_played});',{data_name_value, time_played})
-            }
-            session_save.commit();
-            session_save.close();
-          });
-        }
-        finally{
-          list.removeChild(data_name);
-          list.removeChild(send_btn);
-          var score = document.createElement("p");
-          score.setAttribute("id", "score");
-          table_score();
-          list.appendChild(score); 
+      send_btn.onclick = async () => {
+        const nombre = data_name.value.trim();
+        if (!nombre) return;
+        if (nombre.length > 20) {
+          alert("El nombre debe tener máximo 20 caracteres");
+          return;
         }
 
-       
-      }
+        // ⛔ Evitar múltiples envíos
+        send_btn.disabled = true;
+        window.lastPlayerName = nombre;
+
+
+        await saveScore(nombre, time_played);
+
+        // 🧹 Eliminar input y botón
+        list.removeChild(data_name);
+        list.removeChild(send_btn);
+
+        // 🧾 Mostrar ranking normal
+        await table_score();
+      };
+
       
       list.appendChild(data_name);
       list.appendChild(send_btn);
@@ -249,10 +299,10 @@ document.addEventListener('DOMContentLoaded', ()=> {
     else{
       document.querySelector("#fail").play();
 
-      var score = document.createElement("p");
-      score.setAttribute("id", "score");
-      table_score();
-      list.appendChild(score);
+      //var score = document.createElement("p");
+      //score.setAttribute("id", "score");
+      await table_score();
+      //list.appendChild(score);
     }
 
     camada = 1;

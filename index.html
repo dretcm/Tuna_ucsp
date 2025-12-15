@@ -6,11 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="utils/style.css">
-    <script src="https://unpkg.com/neo4j-driver"></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    limit,
+    where,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBAvQAyY1BYrt4EizwZ7fDCdcnWUadHmu8",
+    authDomain: "tuna-game-7089e.firebaseapp.com",
+    projectId: "tuna-game-7089e",
+    storageBucket: "tuna-game-7089e.firebasestorage.app",
+    messagingSenderId: "510432277748",
+    appId: "1:510432277748:web:df9e2dc16257f77c40daa1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.fs = { collection, addDoc, getDocs, query, orderBy, limit, where, updateDoc };
+</script>
+
 
   </head>
 
-<body style="background-image: url('utils/pandero.jpg');
+<body style="background-image: url('utils/pandero.png');
       background-size: cover;
       background-repeat:no-repeat;
       background-color:#3d23da;">
@@ -21,15 +51,15 @@
     <br>
 
     <button id="button-container" disabled>
-    <p id="info">
-      Clickea según el número de R.O.A.<br>
-      El primer click será el primero<br>
-      el segundo click el segundo, etc.
-    </p>
-    <br>
-    <p id="score">
-      Loading DataBase Score ... Continue with Start
-    </p>
+      <p id="info">
+        Clickea según el número de R.O.A.<br>
+        El primer click será el primero<br>
+        el segundo click el segundo, etc.
+      </p>
+      <br>
+      <p id="score">
+        Cargando Tabla de puntajes ... Continua con Start.
+      </p>
     </button>
 
     <audio id="play" src="utils/full_sexo.ogg">

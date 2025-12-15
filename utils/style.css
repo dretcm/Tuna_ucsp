@@ -1,71 +1,196 @@
+/* =========================
+   RESET BÁSICO
+========================= */
 * {
-  padding: 0; 
+  padding: 0;
   margin: 0;
-  align-items: center;
+  box-sizing: border-box;
+}
+/* =========================
+   BOTONES DEL JUEGO
+========================= */
+#btn {
+  position: relative;
+  padding: 0.45em 0.6em;
+  font-size: clamp(16px, 2.4vw, 34px);
+  font-family: "Arial", sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fff;
+
+  background: linear-gradient(145deg, #ff2fa1, #d01378);
+  border-radius: 10px;
+  border: none;
+
+  box-shadow:
+    0 6px 0 #9b0f57,
+    0 10px 20px rgba(0,0,0,0.25);
+
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-#btn{
-  position: flex; box-sizing: content-box; padding:0.3em 0.3em;
-  font-size: 2.5vw; font-family: sans-serif; font-weight : bold;
-  color:#fff;
-  background-color: #FF1493; /*#f14ebd;*/
-  transition: all 0.2s;
-  border:0.16em solid rgba(255,255,255,0);
-  text-decoration:none;
-  text-shadow: 0 0.04em 0.04em rgba(0,0,0,0.35);
-  margin-bottom: 0.5em;
+#btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 0 #9b0f57,
+    0 14px 24px rgba(0,0,0,0.3);
 }
 
-#btn:hover{
-  border-color: #c71237;
+#btn:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #9b0f57,
+    0 4px 10px rgba(0,0,0,0.25);
 }
 
+/* =========================
+   CONTENEDOR PRINCIPAL
+========================= */
 #button-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #7070ff; /* Color morado claro */
-  padding: 0.8em; /* Espaciado interno */
-  border: 0.5em solid #c71237; /* Borde rojo claro */
+  background-color: #7070ff;
+  padding: 0.8em;
+  border: 0.5em solid #c71237;
+  gap: 0.6em;
 }
 
-
+/* =========================
+   ANIMACIÓN DISPARO
+========================= */
 @keyframes bullet-animation {
-  0% { transform: scale(1); opacity: 1; }
+  0%   { transform: scale(1); opacity: 1; }
   100% { transform: scale(4); opacity: 0; }
 }
 
 .shot {
   animation: bullet-animation 0.5s ease;
+  pointer-events: none;
 }
 
+/* =========================
+   BOTÓN PRINCIPAL (START / ENVIAR)
+========================= */
+#btn_title {
+  padding: 0.5em 0.9em;
+  font-size: clamp(18px, 3vw, 40px);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 
-#btn_title{
-  padding:0.3em 0.3em;
-  font-size: 3vw; /* Tamaño de fuente deseado */
-  font-weight: bold; /* Estilo de fuente en negrita */
-  text-align: center; /* Alinear el texto al centro */
-  text-transform: uppercase; /* Convertir el texto a mayúsculas */
+  color: #fff;
+  background: linear-gradient(145deg, #3b3bff, #1d1dd6);
+
+  border-radius: 14px;
+  border: none;
+
+  box-shadow:
+    0 8px 0 #1414a8,
+    0 16px 30px rgba(0,0,0,0.3);
+
   cursor: pointer;
-  color:#fff;
-  background-color: #2929da; /*#f14ebd;*/
-  transition: all 0.2s;
-  border:0.16em solid rgba(255,255,255,0);
-  text-shadow: 0 0.04em 0.04em rgba(0,0,0,0.35);
-  margin-bottom: 0.2em;
-  text-decoration: underline;
+  transition: all 0.18s ease;
 }
 
-#btn_title:hover{
-  border-color: #c71237;
+#btn_title:hover {
+  transform: translateY(-2px);
 }
 
-#info, #score{
-  font-family: "Arial", sans-serif; /* Fuente del texto */
-  font-size: 2.5vw;
-  color: #333; /* Color del texto */
-  background-color: #f2f2f2; /* Color de fondo */
-  padding: 1.2vw; /* Espaciado interno */
-  border-radius: 0.2em; /* Borde redondeado */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra */
+#btn_title:active {
+  transform: translateY(5px);
+  box-shadow:
+    0 3px 0 #1414a8,
+    0 6px 14px rgba(0,0,0,0.25);
+}
+
+/* =========================
+   TEXTO INFO Y SCORE
+========================= */
+#info,
+#score {
+  width: 100%;
+  max-width: 520px;
+
+  font-family: "Arial", sans-serif;
+  font-size: clamp(14px, 2.4vw, 26px);
+  font-weight: 600;
+  line-height: 1.4;
+
+  color: #222;
+  background: linear-gradient(180deg, #ffffff, #f0f0f0);
+
+  padding: 0.9em 1em;
+  margin-bottom: 0.6em;
+
+  border-radius: 14px;
+  border: 3px solid #2929da;
+
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.6),
+    0 6px 18px rgba(0,0,0,0.15);
+
+  text-align: center;
+}
+/* =========================
+   INPUT NOMBRE JUGADOR
+========================= */
+#player_name {
+  width: 100%;
+  max-width: 320px;
+
+  font-size: clamp(14px, 2.2vw, 22px);
+  font-weight: 600;
+
+  padding: 0.6em 0.8em;
+  margin-bottom: 0.6em;
+
+  border-radius: 10px;
+  border: 3px solid #2929da;
+  outline: none;
+
+  background-color: #fff;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
+}
+
+#player_name:focus {
+  border-color: #ff2fa1;
+  box-shadow:
+    0 0 0 3px rgba(255,47,161,0.3),
+    inset 0 2px 6px rgba(0,0,0,0.1);
+}
+
+
+/* =========================
+   MEDALLAS LEADERBOARD
+========================= */
+.gold {
+  color: #e6c301;
+  font-weight: 900;
+  animation: shine 1.4s infinite alternate;
+}
+
+.silver {
+  color: #c0c0c0;
+  font-weight: 800;
+}
+
+.bronze {
+  color: #cd7f32;
+  font-weight: 800;
+}
+
+.me {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+  padding: 0.2em 0.4em;
+}
+
+/* =========================
+   ANIMACIÓN ORO
+========================= */
+@keyframes shine {
+  from { text-shadow: 0 0 5px #FFD700; }
+  to   { text-shadow: 0 0 15px #FFD700; }
 }
