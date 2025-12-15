@@ -111,7 +111,7 @@
 #info,
 #score {
   width: 100%;
-  max-width: 520px;
+  max-width: min(95vw, 900px);
 
   font-family: "Arial", sans-serif;
   font-size: clamp(14px, 2.4vw, 26px);
@@ -194,3 +194,4 @@
   from { text-shadow: 0 0 5px #FFD700; }
   to   { text-shadow: 0 0 15px #FFD700; }
 }
+
